@@ -1,13 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-GeoNames
-version:      0.06
-version_from: lib/Geo/GeoNames.pm
-installdirs:  site
+--- #YAML:1.0
+name:               Geo-GeoNames
+version:            0.07
+abstract:           Perform geographical queries using GeoNames Web Services
+author:
+    - Per Henrik Johansen <per.henrik.johansen@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-    JSON:                          1.14
-    LWP:                           5.805
-    XML::Simple:                   2.13
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+    JSON:         1.14
+    LWP:          5.805
+    XML::Simple:  2.13
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
