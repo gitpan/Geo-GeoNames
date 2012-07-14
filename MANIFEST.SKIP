@@ -1,0 +1,10 @@
+.DS_Store
+tar.gz$
+\.git
+Makefile$
+\.bak$
+blib\b
+\.tar$
+Geo-.*\d
+\.old$
+\.releaserc

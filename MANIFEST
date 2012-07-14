@@ -1,9 +1,14 @@
-.releaserc
 Changes
+examples/find_city.pl
 lib/Geo/GeoNames.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
+MYMETA.json
+MYMETA.yml
 README
 t/Geo-GeoNames.t
+t/pod.t
+t/pod_coverage.t
 t/url.t
