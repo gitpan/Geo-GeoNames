@@ -9,8 +9,7 @@ use LWP;
 
 use vars qw($DEBUG $CACHE);
 
-our $VERSION = '0.08';
-our $GNURL = 'http://api.geonames.org';
+our $VERSION = '0.09';
 
 our %searches = (
 	cities                              => 'cities?',
@@ -112,63 +111,63 @@ our %valid_parameters = (
 		username => 'r',
 		},
 	find_nearby_wikipedia_by_postalcode => {
-		postalcode    => 'r',
+		postalcode => 'r',
 		country    => 'r',
-		radius    => 'o',
+		radius     => 'o',
 		maxRows    => 'o',
-		username => 'r',
+		username   => 'r',
 		},
 	wikipedia_search => {
-		'q'    => 'r',
-		lang    => 'o',
+		'q'      => 'r',
+		lang     => 'o',
 		title    => 'o',
-		maxRows    => 'o',
+		maxRows  => 'o',
 		username => 'r',
 		},
 	wikipedia_bounding_box => {
 		south    => 'r',
 		north    => 'r',
-		east    => 'r',
-		west    => 'r',
-		lang    => 'o',
-		maxRows    => 'o',
+		east     => 'r',
+		west     => 'r',
+		lang     => 'o',
+		maxRows  => 'o',
 		username => 'r',
 		},
 	country_info => {
-		country    => 'o',
-		lang    => 'o',
+		country  => 'o',
+		lang     => 'o',
 		username => 'r',
 		},
 	country_code => {
-		lat    => 'r',
-		lng    => 'r',
-		lang    => 'o',
-		radius    => 'o',
+		lat      => 'r',
+		lng      => 'r',
+		lang     => 'o',
+		radius   => 'o',
 		username => 'r',
 		},
 	find_nearby_weather => {
-		lat    => 'r',
-		lng    => 'r',
+		lat      => 'r',
+		lng      => 'r',
 		username => 'r',
 		},
 	cities => {
-		north    => 'r',
-		south    => 'r',
-		east    => 'r',
-		west    => 'r',
-		lang    => 'o',
+		north      => 'r',
+		south      => 'r',
+		east       => 'r',
+		west       => 'r',
+		lang       => 'o',
 		maxRows    => 'o',
-		username => 'r',
+		username   => 'r',
 		},
 	earthquakes => {
-		north    => 'r',
-		south    => 'r',
-		east    => 'r',
-		west    => 'r',
-		date    => 'o',
+		north           => 'r',
+		south           => 'r',
+		east            => 'r',
+		west            => 'r',
+		date            => 'o',
 		minMagnutide    => 'o',
-		maxRows    => 'o',
-		username => 'r',
+		maxRows         => 'o',
+		username        => 'r',
 		}
 	);
 
@@ -177,18 +176,18 @@ sub new {
 
 	my $self = bless { _functions => \%searches }, $class;
 
-	croak <<"HERE" unless exists $hash{username};
+	croak <<"HERE" unless length $hash{username};
 You must specify a GeoNames username to use Geo::GeoNames.
 See http://www.geonames.org/export/web-services.html
 HERE
 
 	$self->username( $hash{username} );
+	$self->url( $hash{url} // $self->default_url );
 
-	(exists($hash{url})) ? $self->{url} = $hash{url} : $self->{url} = $GNURL;
 	(exists($hash{debug})) ? $DEBUG = $hash{debug} : 0;
 	(exists($hash{cache})) ? $CACHE = $hash{cache} : 0;
 	$self->{_functions} = \%searches;
-	bless $self, $class;
+
 	return $self;
 	}
 
@@ -199,6 +198,8 @@ sub username {
 
 	$self->{username};
 	}
+
+sub default_url { 'http://api.geonames.org' }
 
 sub url {
 	my( $self, $url ) = @_;
@@ -211,7 +212,7 @@ sub url {
 sub _build_request {
 	my( $self, $request, @args ) = @_;
 	my $hash = { @args, username => $self->username };
-	my $request_string = $GNURL . '/' . $searches{$request};
+	my $request_string = $self->url . '/' . $searches{$request};
 
 	# check to see that mandatory arguments are present
 	my $conditional_mandatory_flag = 0;
@@ -243,6 +244,7 @@ sub _build_request {
 	foreach my $key (keys(%$hash)) {
 		carp("Invalid argument $key") if(!defined($valid_parameters{$request}->{$key}));
 		my @vals = ref($hash->{$key}) ? @{$hash->{$key}} : $hash->{$key};
+		no warnings 'uninitialized';
 		$request_string .= join("", map { "$key=$_&" } @vals );
 		}
 
@@ -260,7 +262,8 @@ sub _parse_xml_result {
 	my $i = 0;
 	foreach my $element (keys %{$xml}) {
 		if ($element eq 'status') {
-			carp "ERROR: " . $xml->{$element}->[0]->{message};
+			carp "GeoNames error: " . $xml->{$element}->[0]->{message};
+			return [];
 			}
 		next if (ref($xml->{$element}) ne "ARRAY");
 		foreach my $list (@{$xml->{$element}}) {
@@ -441,6 +444,10 @@ username parameter is required.
 
 With a single argument, set the GeoNames username and return that
 username. With no arguments, return the username.
+
+=item default_url
+
+Returns C<http://api.geonames.org>.
 
 =item url( $url )
 
