@@ -13,3 +13,4 @@ t/pod.t
 t/pod_coverage.t
 t/url.t
 t/username.t
+META.json                                Module JSON meta-data (added by MakeMaker)
