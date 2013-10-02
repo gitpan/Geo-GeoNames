@@ -5,11 +5,11 @@ use strict;
 use warnings;
 
 use Carp;
-use LWP;
+use Mojo::UserAgent;
 
 use vars qw($DEBUG $CACHE);
 
-our $VERSION = '0.11';
+our $VERSION = '1.01';
 
 our %searches = (
 	cities                              => 'cities?',
@@ -35,7 +35,7 @@ our %searches = (
 #	o	= optional
 #	rc	= required - only one of the fields marked with rc is allowed. At least one must be present
 #	om	= optional, multiple entries allowed
-#	d	= depreciated - will be removed in later versions
+#	d	= deprecated - will be removed in later versions
 our %valid_parameters = (
 	search => {
 		'q'    => 'rc',
@@ -220,7 +220,7 @@ sub _build_request {
 	foreach my $arg (keys %{$valid_parameters{$request}}) {
 		my $flags = $valid_parameters{$request}->{$arg};
 		if($flags =~ /d/ && exists($hash->{$arg})) {
-			carp("Argument $arg is depreciated.");
+			carp("Argument $arg is deprecated.");
 			}
 		$flags =~ s/d//g;
 		if($flags eq 'r' && !exists($hash->{$arg})) {
@@ -316,13 +316,14 @@ sub _parse_text_result {
 	}
 
 sub _request {
-	my( $self, $request ) = @_;
-	my $browser = LWP::UserAgent->new;
-	$browser->env_proxy();
-	my $response = $browser->get($request);
-	carp "Can't get $request -- ", $response->status_line
-		unless $response->is_success;
-	return $response;
+	my( $self, $request_url ) = @_;
+	state $ua = do {
+		my $ua = Mojo::UserAgent->new;
+		$ua->on( error => sub { carp "Can't get request" } );
+		$ua;
+		};
+
+	$ua->get( $request_url )->res;
 	}
 
 sub _do_search {
@@ -333,18 +334,20 @@ sub _do_search {
 
 	# check mime-type to determine which parse method to use.
 	# we accept text/xml, text/plain (how do see if it is JSON or not?)
-	my $mime_type = $response->header( 'Content-type' );
+	my $mime_type = $response->headers->header( 'Content-type' );
+
 	if($mime_type =~ m(\Atext/xml;) ) {
-		return $self->_parse_xml_result( $response->content );
+		return $self->_parse_xml_result( $response->body );
 		}
 	if($mime_type =~ m(\Aapplication/json;) ) {
 		# a JSON object always start with a left-brace {
 		# according to http://json.org/
-		if( $response->content =~ m/\A\{/ ) {
-			return $self->_parse_json_result( $response->content );
+		my $body = $response->body;
+		if( $body =~ m/\A\{/ ) {
+			return $response->json
 			}
 		else {
-			return $self->_parse_text_result( $response->content );
+			return $self->_parse_text_result( $body );
 			}
 		}
 
@@ -488,7 +491,7 @@ as follows:
 One, and only one, of B<q>, B<name>, or B<name_equals> must be
 supplied to this function.
 
-fclass is depreciated.
+fclass is deprecated.
 
 For a thorough description of the arguments, see
 http://www.geonames.org/export/geonames-search.html

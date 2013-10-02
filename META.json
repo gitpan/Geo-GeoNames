@@ -5,7 +5,10 @@
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
-   "keywords" : [],
+   "keywords" : [
+      "geo",
+      "geonames"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -34,7 +37,7 @@
       "runtime" : {
          "requires" : {
             "JSON" : "1.14",
-            "LWP" : "5.805",
+            "Mojo::UserAgent" : 0,
             "Test::More" : "0.94",
             "XML::Simple" : "2.13",
             "perl" : "5.01"
@@ -48,9 +51,12 @@
       },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "x_Metaspec" : {
+         "version" : "2"
+      }
    },
-   "version" : "0.11",
+   "version" : "1.01",
    "x_test_requires" : {
       "Test::More" : "0.94"
    }

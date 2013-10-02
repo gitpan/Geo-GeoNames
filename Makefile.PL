@@ -5,7 +5,7 @@ unless( exists $ENV{GEONAMES_USER} ) {
 	print <<"HERE";
 To test Geo::GeoNames, you need a a GeoNames account enabled at least
 for free access. Start at http://www.geonames.org/login to create a
-new account.
+new account. Set GEONAMES_USER to run the tests.
 HERE
 	}
 
@@ -19,7 +19,7 @@ WriteMakefile(
 
 	PREREQ_PM      => {
 		XML::Simple => '2.13',
-		LWP         => '5.805',
+		Mojo::UserAgent => '0',
 		JSON        => '1.14',
 		Test::More  => '0.94',
 		},
@@ -34,10 +34,15 @@ WriteMakefile(
 			Test::More => '0.94',
 			},
 		resources => {
-			repository => 'git@github.com:briandfoy/geo-geonames.git',
+			'meta-spec' => { version => '2' },
+			repository => {
+				type => 'git',
+				url  => 'git://github.com/briandfoy/geo-geonames.git',
+				web  => 'https://github.com/briandfoy/geo-geonames',
+				},
 			license    => 'http://dev.perl.org/licenses/',
 			bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-GeoNames'
 			},
-		keywords => [ qw() ],
+		keywords => [ qw(geo geonames) ],
 		},
 	);
