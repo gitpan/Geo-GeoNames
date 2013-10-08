@@ -38,13 +38,13 @@
          "requires" : {
             "JSON" : "1.14",
             "Mojo::UserAgent" : 0,
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "XML::Simple" : "2.13",
             "perl" : "5.01"
          }
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-GeoNames"
@@ -56,7 +56,7 @@
          "version" : "2"
       }
    },
-   "version" : "1.01",
+   "version" : "1.01_01",
    "x_test_requires" : {
       "Test::More" : "0.94"
    }
